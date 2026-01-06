@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import api from './api/axios';
+import AccountManagement from './pages/AccountManagement';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -68,6 +69,7 @@ function App() {
             <Route path="/login" element={!isLoggedIn ? <Login onLogin={handleLogin} /> : <Dashboard user={user} onLogout={handleLogout} />} />
             <Route path="/" element={isLoggedIn ? <Dashboard user={user} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />} />
             {/* 추후 /accounts (상담원 관리), /schedule (시간표 작성) 경로 추가 */}
+            <Route path="/accounts" element={isLoggedIn ? <AccountManagement /> : <Login onLogin={handleLogin} />} />
           </Routes>
         </div>
     </div>

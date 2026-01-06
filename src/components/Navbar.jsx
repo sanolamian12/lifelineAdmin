@@ -1,8 +1,11 @@
 import React from 'react';
 import { Button } from 'antd';
 import { BankOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom'; // 추가
 
 const Navbar = ({ isLoggedIn }) => {
+    const navigate = useNavigate(); // 추가
+
   return (
     <div style={{
       display: 'flex',
@@ -17,7 +20,9 @@ const Navbar = ({ isLoggedIn }) => {
       </div>
 
       <div style={{ display: 'flex', gap: '20px' }}>
-        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>
+        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}
+        onClick={() => navigate('/accounts')} // 상담원 관리 페이지로 이동
+        >
           상담원 관리
         </Button>
         <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>
