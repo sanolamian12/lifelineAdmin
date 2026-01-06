@@ -25,7 +25,9 @@ const Navbar = ({ isLoggedIn }) => {
         >
           상담원 관리
         </Button>
-        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>
+        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}
+        onClick={() => navigate('/activities')}
+        >
           활동 이력 관리
         </Button>
         <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>

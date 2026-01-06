@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import api from './api/axios';
 import AccountManagement from './pages/AccountManagement';
+import ActivityManagement from './pages/ActivityManagement';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,6 +71,7 @@ function App() {
             <Route path="/" element={isLoggedIn ? <Dashboard user={user} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />} />
             {/* 추후 /accounts (상담원 관리), /schedule (시간표 작성) 경로 추가 */}
             <Route path="/accounts" element={isLoggedIn ? <AccountManagement /> : <Login onLogin={handleLogin} />} />
+            <Route path="/activities" element={isLoggedIn ? <ActivityManagement /> : <Login onLogin={handleLogin} />} />
           </Routes>
         </div>
     </div>
