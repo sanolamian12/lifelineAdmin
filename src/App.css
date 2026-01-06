@@ -1,0 +1,34 @@
+/* src/App.css */
+
+#root {
+  width: 100%;
+  margin: 0;
+}
+
+.App {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 추가: 자식 요소들을 가로 중앙으로 보냄 */
+}
+
+.main-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 */
+  align-items: center;     /* 가로 중앙 */
+  width: 100%;
+}
+
+.login-box {
+  display: block;          /* 추가 */
+  width: 500px;
+  padding: 60px;
+  border: 2px solid #002060;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin: 0 auto;          /* 가로 중앙 정렬 핵심 */
+}
