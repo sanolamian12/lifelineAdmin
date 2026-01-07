@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import api from './api/axios';
 import AccountManagement from './pages/AccountManagement';
 import ActivityManagement from './pages/ActivityManagement';
+import ScheduleManagement from './pages/ScheduleManagement';
+import NewScheduleEditor from './pages/NewScheduleEditor';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,6 +74,8 @@ function App() {
             {/* 추후 /accounts (상담원 관리), /schedule (시간표 작성) 경로 추가 */}
             <Route path="/accounts" element={isLoggedIn ? <AccountManagement /> : <Login onLogin={handleLogin} />} />
             <Route path="/activities" element={isLoggedIn ? <ActivityManagement /> : <Login onLogin={handleLogin} />} />
+            <Route path="/schedule" element={isLoggedIn ? <ScheduleManagement /> : <Login onLogin={handleLogin} />} />
+            <Route path="/newSchedule" element={isLoggedIn ? <NewScheduleEditor /> : <Login onLogin={handleLogin} />} />
           </Routes>
         </div>
     </div>

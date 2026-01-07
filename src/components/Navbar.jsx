@@ -30,10 +30,14 @@ const Navbar = ({ isLoggedIn }) => {
         >
           활동 이력 관리
         </Button>
-        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>
-          스케줄 보기
+        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}
+        onClick={() => navigate('/schedule')}
+        >
+          스케줄 관리
         </Button>
-        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}>
+        <Button size="large" type="primary" disabled={!isLoggedIn} style={{ height: '60px', width: '200px', fontSize: '24px' }}
+        onClick={() => navigate('/newSchedule')}
+        >
           새 시간표 작성
         </Button>
       </div>
