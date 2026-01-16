@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://3.26.146.6:3000', // 실제 서버 IP 주소로 변경하세요
+  baseURL: 'http://13.210.139.139:3000', // 실제 서버 IP 주소로 변경하세요
   headers: {
     'Content-Type': 'application/json',
   },
