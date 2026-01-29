@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://13.210.139.139:3000', // 실제 서버 IP 주소로 변경하세요
+
+  // baseURL을 도메인 기반의 상대 경로로 변경합니다.
+  // 이렇게 하면 https://admin.koreanlifeline.org/api 로 요청이 전달됩니다.
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
