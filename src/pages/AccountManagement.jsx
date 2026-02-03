@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, message, Space, Popconfirm } from 'antd';
+import { Table, Button, Modal, Form, Input, message, Space, Popconfirm, Checkbox } from 'antd';
 import { UserAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import api from '../api/axios';
 
@@ -76,11 +76,43 @@ const AccountManagement = () => {
     }
   };
 
+  // 관리 권한(isChief) 변경 처리 함수
+  const handleToggleChief = async (targetId, currentStatus) => {
+    try {
+      // 1. 컨트롤러의 @Patch('admin/update-account') 경로 사용
+      // 2. @Query('targetId')이므로 URL 뒤에 ?targetId=${targetId} 추가
+      // 3. @Body()에 수정할 데이터 { isChief: 값 } 전달
+      await api.patch(`/auth/admin/update-account?targetId=${targetId}`, {
+        isChief: !currentStatus // 현재 상태의 반대값으로 토글
+      });
+
+      message.success('관리 권한이 변경되었습니다.');
+      fetchAccounts(); // 변경 후 리스트 갱신
+    } catch (error) {
+      console.error("권한 변경 에러:", error);
+      message.error('권한 변경에 실패했습니다.');
+    }
+  };
+
   const columns = [
     { title: '번호', dataIndex: 'index', key: 'index', render: (text, record, index) => <span style={{ fontSize: '20px' }}>{index + 1}</span>},
     { title: '아이디', dataIndex: 'account_id', key: 'account_id' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
     { title: '성함', dataIndex: 'account_name', key: 'account_name' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
     { title: '전화번호', dataIndex: 'account_phone', key: 'account_phone' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
+    {
+      title: '관리 권한',
+      key: 'isChief',
+      align: 'center', // 가운데 정렬
+      render: (_, record) => (
+        <Checkbox
+          checked={record.isChief}
+          onChange={() => handleToggleChief(record.account_id, record.isChief)}
+          style={{ transform: 'scale(1.3)' }} // 크기 살짝 키움
+        >
+          <span style={{ fontSize: '18px', marginLeft: '4px' }}>마스터</span>
+        </Checkbox>
+      )
+    },
     {
       title: '관리',
       key: 'action',
