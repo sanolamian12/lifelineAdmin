@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, message, Space, Popconfirm, Checkbox } from 'antd';
+import { Table, Button, Modal, Form, Input, message, Popconfirm, Checkbox } from 'antd';
 import { UserAddOutlined, DeleteOutlined } from '@ant-design/icons';
 import api from '../api/axios';
 
@@ -13,7 +13,6 @@ const AccountManagement = () => {
   const fetchAccounts = async () => {
     setLoading(true);
     try {
-      // 컨트롤러 설정에 따라 'auth/accounts' 또는 '/accounts' 호출
       const response = await api.get('/auth/accounts');
       setAccounts(response.data);
     } catch (error) {
@@ -23,12 +22,10 @@ const AccountManagement = () => {
     }
   };
 
-  // 1. 중복 체크 함수 추가
+  // 2. 중복 체크 함수
   const checkIdDuplication = async (rule, value) => {
     if (!value) return Promise.resolve();
-
     try {
-      // 백엔드의 GET /auth/check-duplicate?id=... API 활용
       await api.get(`/auth/check-duplicate?id=${value}`);
       return Promise.resolve();
     } catch (error) {
@@ -40,7 +37,7 @@ const AccountManagement = () => {
     fetchAccounts();
   }, []);
 
-  // 2. 상담원 등록 처리
+  // 3. 상담원 등록 처리
   const handleCreate = async (values) => {
     try {
       await api.post('/auth/create', {
@@ -48,68 +45,92 @@ const AccountManagement = () => {
         password: values.password,
         name: values.name,
         phone: values.phone,
-        isChief: false, // 기본적으로 상담원으로 생성
+        isChief: false,
       });
       message.success('상담원이 성공적으로 등록되었습니다.');
       setIsModalVisible(false);
       form.resetFields();
-      fetchAccounts(); // 리스트 갱신
+      fetchAccounts();
     } catch (error) {
       const errorMsg = error.response?.data?.message || '등록 실패';
       message.error(errorMsg);
     }
   };
 
-  // 3. 상담원 삭제 처리
+  // 4. 상담원 삭제 처리 (Hard Delete)
   const handleDelete = async (targetId) => {
     try {
       await api.delete(`/auth/admin/delete-account?targetId=${targetId}`);
       message.success('삭제되었습니다.');
       fetchAccounts();
     } catch (error) {
-      // 백엔드에서 던지는 "시간표 배정 에러" 메시지를 그대로 출력
       const errorMsg = error.response?.data?.message || '삭제 중 오류가 발생했습니다.';
-      Modal.error({
-        title: '삭제 불가',
-        content: errorMsg,
-      });
+      Modal.error({ title: '삭제 불가', content: errorMsg });
     }
   };
 
-  // 관리 권한(isChief) 변경 처리 함수
+  // 5. 관리 권한(isChief) 변경
   const handleToggleChief = async (targetId, currentStatus) => {
     try {
-      // 1. 컨트롤러의 @Patch('admin/update-account') 경로 사용
-      // 2. @Query('targetId')이므로 URL 뒤에 ?targetId=${targetId} 추가
-      // 3. @Body()에 수정할 데이터 { isChief: 값 } 전달
       await api.patch(`/auth/admin/update-account?targetId=${targetId}`, {
-        isChief: !currentStatus // 현재 상태의 반대값으로 토글
+        isChief: !currentStatus
       });
-
       message.success('관리 권한이 변경되었습니다.');
-      fetchAccounts(); // 변경 후 리스트 갱신
+      fetchAccounts();
     } catch (error) {
-      console.error("권한 변경 에러:", error);
       message.error('권한 변경에 실패했습니다.');
     }
   };
 
+  // 6. [추가] 삭제 요청(isDeleted) 상태 변경
+  const handleToggleWithdraw = async (targetId, currentStatus) => {
+    try {
+      await api.patch(`/auth/admin/update-account?targetId=${targetId}`, {
+        isDeleted: !currentStatus
+      });
+      message.success(currentStatus ? '삭제 요청이 취소되었습니다.' : '삭제 요청 상태로 변경되었습니다.');
+      fetchAccounts();
+    } catch (error) {
+      message.error('상태 변경에 실패했습니다.');
+    }
+  };
+
   const columns = [
-    { title: '번호', dataIndex: 'index', key: 'index', render: (text, record, index) => <span style={{ fontSize: '20px' }}>{index + 1}</span>},
-    { title: '아이디', dataIndex: 'account_id', key: 'account_id' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
-    { title: '성함', dataIndex: 'account_name', key: 'account_name' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
-    { title: '전화번호', dataIndex: 'account_phone', key: 'account_phone' , render: (text) => <span style={{ fontSize: '20px' }}>{text}</span>},
+    { title: '번호', dataIndex: 'index', key: 'index', render: (text, record, index) => <span style={{ fontSize: '18px' }}>{index + 1}</span>},
+    { title: '아이디', dataIndex: 'account_id', key: 'account_id' , render: (text) => <span style={{ fontSize: '18px' }}>{text}</span>},
+    { title: '성함', dataIndex: 'account_name', key: 'account_name' , render: (text) => <span style={{ fontSize: '18px' }}>{text}</span>},
+    {
+      title: '삭제 요청',
+      key: 'isDeleted',
+      align: 'center',
+      render: (_, record) => (
+        <Checkbox
+          checked={record.isDeleted}
+          onChange={() => handleToggleWithdraw(record.account_id, record.isDeleted)}
+          style={{ transform: 'scale(1.3)' }}
+        >
+          <span style={{
+            fontSize: '16px',
+            marginLeft: '4px',
+            color: record.isDeleted ? '#ff4d4f' : '#8c8c8c',
+            fontWeight: record.isDeleted ? 'bold' : 'normal'
+          }}>
+            {record.isDeleted ? '삭제요청중' : '정상'}
+          </span>
+        </Checkbox>
+      )
+    },
     {
       title: '관리 권한',
       key: 'isChief',
-      align: 'center', // 가운데 정렬
+      align: 'center',
       render: (_, record) => (
         <Checkbox
           checked={record.isChief}
           onChange={() => handleToggleChief(record.account_id, record.isChief)}
-          style={{ transform: 'scale(1.3)' }} // 크기 살짝 키움
+          style={{ transform: 'scale(1.3)' }}
         >
-          <span style={{ fontSize: '18px', marginLeft: '4px' }}>마스터</span>
+          <span style={{ fontSize: '16px', marginLeft: '4px' }}>마스터</span>
         </Checkbox>
       )
     },
@@ -123,7 +144,7 @@ const AccountManagement = () => {
           okText="예"
           cancelText="아니오"
         >
-          <Button type="primary" danger icon={<DeleteOutlined />} size="large" style={{ fontSize: '18px' }}>삭제</Button>
+          <Button type="primary" danger icon={<DeleteOutlined />} size="large">삭제</Button>
         </Popconfirm>
       ),
     },
@@ -131,8 +152,8 @@ const AccountManagement = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h2>상담원 관리</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
+        <h2 style={{ margin: 0 }}>상담원 관리</h2>
         <Button
           type="primary"
           icon={<UserAddOutlined />}
@@ -151,9 +172,8 @@ const AccountManagement = () => {
         pagination={{ pageSize: 10 }}
       />
 
-      {/* 상담원 추가 모달 */}
       <Modal
-        title={<span style={{ fontSize: '24px' }}>새 상담원 등록</span>}
+        title={<span style={{ fontSize: '20px' }}>새 상담원 등록</span>}
         open={isModalVisible}
         onOk={() => form.submit()}
         onCancel={() => setIsModalVisible(false)}
@@ -161,22 +181,19 @@ const AccountManagement = () => {
         cancelText="취소"
       >
         <Form form={form} layout="vertical" onFinish={handleCreate}>
-          <Form.Item name="accountId" label={<span style={{ fontSize: '20px' }}>아이디</span>}
-          rules={[
-            { required: true, message: '아이디를 입력하세요' },
-            { validator: checkIdDuplication } // 실시간 검증 추가
-          ]}
-          validateTrigger="onBlur">
-            <Input style={{ fontSize: '18px', height: '45px' }} />
+          <Form.Item name="accountId" label="아이디"
+            rules={[{ required: true, message: '아이디를 입력하세요' }, { validator: checkIdDuplication }]}
+            validateTrigger="onBlur">
+            <Input />
           </Form.Item>
-          <Form.Item name="password" label={<span style={{ fontSize: '20px' }}>비밀번호</span>} rules={[{ required: true, message: '비밀번호를 입력하세요' }]}>
-            <Input.Password style={{ fontSize: '18px', height: '45px' }} />
+          <Form.Item name="password" label="비밀번호" rules={[{ required: true, message: '비밀번호를 입력하세요' }]}>
+            <Input.Password />
           </Form.Item>
-          <Form.Item name="name" label={<span style={{ fontSize: '20px' }}>성함</span>} rules={[{ required: true, message: '이름을 입력하세요' }]}>
-            <Input style={{ fontSize: '18px', height: '45px' }} />
+          <Form.Item name="name" label="성함" rules={[{ required: true, message: '이름을 입력하세요' }]}>
+            <Input />
           </Form.Item>
-          <Form.Item name="phone" label={<span style={{ fontSize: '20px' }}>전화번호</span>} rules={[{ required: true, message: '전화번호를 입력하세요' }]}>
-            <Input placeholder="04xx xxx xxx" style={{ fontSize: '18px', height: '45px' }} />
+          <Form.Item name="phone" label="전화번호" rules={[{ required: true, message: '전화번호를 입력하세요' }]}>
+            <Input placeholder="04xx xxx xxx" />
           </Form.Item>
         </Form>
       </Modal>
