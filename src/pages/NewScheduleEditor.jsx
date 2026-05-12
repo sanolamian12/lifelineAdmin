@@ -141,7 +141,8 @@ const NewScheduleEditor = () => {
         day: s.day,
         time: `${s.startTime} - ${s.endTime}`,
       }));
-      await api.post('/orders/bulk-update', payload);
+      const offsetMinutes = -new Date().getTimezoneOffset();
+      await api.post(`/orders/bulk-update?offset=${offsetMinutes}`, payload);
       message.success("DB에 성공적으로 적용되었습니다.");
       setMode('applied');
     } catch (e) {
@@ -152,7 +153,8 @@ const NewScheduleEditor = () => {
   const handleUndo = async () => {
     try {
       setLoading(true);
-      await api.post('/orders/restore');
+      const offsetMinutes = -new Date().getTimezoneOffset();
+      await api.post(`/orders/restore?offset=${offsetMinutes}`);
       message.success("이전 백업 데이터로 복구되었습니다.");
       handleLoad();
     } catch (e) {

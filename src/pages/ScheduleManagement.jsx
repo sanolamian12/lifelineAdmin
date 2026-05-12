@@ -137,7 +137,8 @@ const ScheduleManagement = () => {
           time: o.time
         }));
 
-        await api.post('/orders/bulk-update', updateData);
+        const offsetMinutes = -new Date().getTimezoneOffset();
+        await api.post(`/orders/bulk-update?offset=${offsetMinutes}`, updateData);
         message.success("시간표가 성공적으로 업데이트되었습니다.");
 
         // [핵심] 시간표가 바뀌면 현재/다음 상담원도 바뀌므로 데이터를 다시 불러옴
